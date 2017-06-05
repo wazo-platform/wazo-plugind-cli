@@ -10,7 +10,11 @@ Package: wazo-plugind-cli
 Architecture: all
 Depends:
  ${python3:Depends},
- ${misc:Depends}
+ ${misc:Depends},
+ python3-kombu,
+ wazo-plugind-client-python3,
+ xivo-auth-client-python3,
+ xivo-lib-python-python3
 Description: Wazo plugin command line interface
  Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.
