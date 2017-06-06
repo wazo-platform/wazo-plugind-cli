@@ -30,6 +30,7 @@ def main():
                               history_file='~/.wazo_plugind_cli_history')
     interpreter.add_command('install', command.InstallCommand(plugind_client, config))
     interpreter.add_command('uninstall', command.UninstallCommand(plugind_client, config))
+    interpreter.add_command('list', command.ListCommand(plugind_client))
 
     token_renewer.subscribe_to_token_change(plugind_client.set_token)
     command_name = config.get('command')
