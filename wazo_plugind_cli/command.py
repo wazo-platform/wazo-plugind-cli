@@ -82,4 +82,8 @@ class ListCommand(_BasePlugindCommand):
     help = 'List plugins'
 
     def execute(self):
-        return self._client.plugins.list()
+        results = self._client.plugins.list()
+        print('* List of plugins installed *')
+        for result in results['items']:
+            print('- {name} ({version})'.format(**result))
+
