@@ -85,5 +85,5 @@ class ListCommand(_BasePlugindCommand):
         results = self._client.plugins.list()
         print('* List of plugins installed *')
         for result in results['items']:
-            print('- {name} ({version})'.format(**result))
+            print('- {namespace}/{name} ({version})'.format(**result))
 
