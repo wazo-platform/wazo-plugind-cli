@@ -75,3 +75,15 @@ class UninstallCommand(_BaseAsyncCommand):
 
     def execute_async(self, namespace, name):
         return self._client.plugins.uninstall(namespace, name)
+
+
+class ListCommand(_BasePlugindCommand):
+
+    help = 'List plugins'
+
+    def execute(self):
+        results = self._client.plugins.list()
+        print('* List of plugins installed *')
+        for result in results['items']:
+            print('- {namespace}/{name} ({version})'.format(**result))
+
