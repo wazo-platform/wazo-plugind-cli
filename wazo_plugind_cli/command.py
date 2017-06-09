@@ -1,6 +1,8 @@
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import queue
+import threading
 import kombu
 
 from xivo.cli import BaseCommand, UsageError
@@ -19,6 +21,8 @@ class _BasePlugindCommand(BaseCommand):
 
 class _BaseAsyncCommand(_BasePlugindCommand):
 
+    _end_status = ['completed', 'error']
+
     def __init__(self, plugind_client, config):
         super().__init__(plugind_client)
         self.amqp_url = 'amqp://{username}:{password}@{host}:{port}//'.format(**config['bus'])
@@ -33,18 +37,42 @@ class _BaseAsyncCommand(_BasePlugindCommand):
             self.execute_sync(*args[:-1])
 
     def execute_sync(self, *args):
-        result = self.execute_async(*args)
-        routing_key = self.routing_key_fmt.format(result['uuid'])
-
+        msg_queue = queue.Queue()
+        status = None
+        last_status = None
         with kombu.Connection(self.amqp_url) as conn:
-            ProgressConsumer(conn, routing_key, self.exchange).run()
+            consumer = ProgressConsumer(conn, self.routing_key, self.exchange, msg_queue)
+            thread = threading.Thread(target=consumer.run)
+            thread.start()
+            try:
+                result = self.execute_async(*args)
+                command_uuid = result['uuid']
+                last_status = self._wait_for_progress(msg_queue, command_uuid)
+            finally:
+                consumer.should_stop = True
+                thread.join()
+                if last_status and last_status['status'] == 'error':
+                    raise Exception(last_status)
+
+    def _wait_for_progress(self, msg_queue, command_uuid):
+        while True:
+            msg = msg_queue.get()
+            if msg['data']['uuid'] != command_uuid:
+                continue
+
+            status = msg['data']['status']
+            done = status in self._end_status
+            end = '\n' if done else '...\n'
+            print('{}'.format(status), end=end)
+            if done:
+                return msg['data']
 
 
 class InstallCommand(_BaseAsyncCommand):
 
     help = 'Install a plugin'
     usage = '<method> <plugin> [--async]'
-    routing_key_fmt = 'plugin.install.{}.*'
+    routing_key = 'plugin.install.*.*'
 
     def prepare(self, command_args):
         try:
@@ -63,7 +91,7 @@ class UninstallCommand(_BaseAsyncCommand):
 
     help = 'Uninstall a plugin'
     usage = '<namespace>/<name> [--async]'
-    routing_key_fmt = 'plugin.uninstall.{}.*'
+    routing_key = 'plugin.uninstall.*.*'
 
     def prepare(self, command_args):
         try:

@@ -4,7 +4,8 @@
 
 import sys
 
-from xivo.cli import Interpreter
+from xivo.cli import Interpreter, errorhandler
+from xivo.cli.command.unknown import RaisingUnknownCommand
 from xivo.token_renewer import TokenRenewer
 from wazo_plugind_client import Client as PlugindClient
 from xivo_auth_client import Client as AuthClient
@@ -27,7 +28,9 @@ def main():
     plugind_client = PlugindClient(**config['plugind'])
 
     interpreter = Interpreter(prompt='wazo-plugind-cli> ',
-                              history_file='~/.wazo_plugind_cli_history')
+                              history_file='~/.wazo_plugind_cli_history',
+                              error_handler=errorhandler.ReRaiseErrorHandler())
+    interpreter.set_unknown_command_class(RaisingUnknownCommand)
     interpreter.add_command('install', command.InstallCommand(plugind_client, config))
     interpreter.add_command('uninstall', command.UninstallCommand(plugind_client, config))
     interpreter.add_command('list', command.ListCommand(plugind_client))
@@ -38,7 +41,7 @@ def main():
         if command_name:
             interpreter.execute_command_line(command_name)
         else:
-            interpreter.loop()
+            interpreter.loop(error_handler=errorhandler.PrintTracebackErrorHandler())
 
 
 if __name__ == '__main__':

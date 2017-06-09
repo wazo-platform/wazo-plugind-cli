@@ -7,22 +7,18 @@ from kombu.mixins import ConsumerMixin
 
 class ProgressConsumer(ConsumerMixin):
 
-    _end_status = ['completed', 'error']
-
-    def __init__(self, connection, routing_key, exchange):
+    def __init__(self, connection, routing_key, exchange, msg_queue):
         self.connection = connection
         self.routing_key = routing_key
         self._exchange = exchange
+        self._msg_queue = msg_queue
 
     def get_consumers(self, Consumer, channel):
         return [Consumer(kombu.Queue(exchange=self._exchange,
                                      routing_key=self.routing_key,
                                      exclusive=True),
-                         callbacks=[self.on_message])]
+                         callbacks=[self._on_message])]
 
-    def on_message(self, body, message):
-        status = body['data']['status']
-        print(status)
+    def _on_message(self, body, message):
+        self._msg_queue.put(body)
         message.ack()
-        if status in self._end_status:
-            self.should_stop = True
