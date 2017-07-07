@@ -1,8 +1,10 @@
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import argparse
 import queue
 import threading
+import json
 import kombu
 
 from xivo.cli import BaseCommand, UsageError
@@ -76,15 +78,32 @@ class InstallCommand(_BaseAsyncCommand):
 
     def prepare(self, command_args):
         try:
-            method = command_args[0]
-            plugin = command_args[1]
-            async = len(command_args) > 2 and command_args[2] == '--async'
-            return method, plugin, async
+            parser = self._new_argument_parser()
+            parsed_args = parser.parse_args(command_args)
+
+            return (
+                parsed_args.method,
+                parsed_args.url,
+                json.loads(parsed_args.options),
+                parsed_args.async,
+            )
         except Exception:
             raise UsageError()
 
-    def execute_async(self, method, plugin):
-        return self._client.plugins.install(plugin, method)
+    def execute_async(self, method, url, options):
+        return self._client.plugins.install(url, method, options)
+
+    def _new_argument_parsed(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('method', action='store',
+                            help='The install method')
+        parser.add_argument('url', action='store', default=None,
+                            help='The URL of the plugin')
+        parser.add_argument('options', action='store', default=None,
+                            help='Method specific options')
+        parser.add_argument('--async', action='store_true', default=False,
+                            help='execute async')
+        return parser
 
 
 class UninstallCommand(_BaseAsyncCommand):
