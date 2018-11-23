@@ -2,6 +2,6 @@ https://github.com/wazo-pbx/xivo-lib-python/archive/master.zip
 https://github.com/wazo-pbx/xivo-auth-client/archive/master.zip
 kombu==3.0.35
 pyyaml==3.12
-requests==2.12.4
+requests==2.20.0
 six==1.10.0
 stevedore==1.17.1
