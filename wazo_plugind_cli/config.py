@@ -1,4 +1,4 @@
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import argparse
@@ -9,7 +9,7 @@ _CERT_FILE = '/usr/share/xivo-certs/server.crt'
 _DEFAULT_CONFIG = {
     'auth': {
         'host': 'localhost',
-        'key_file': '/var/lib/xivo-auth-keys/wazo-plugind-cli-key.yml',
+        'key_file': '/var/lib/wazo-auth-keys/wazo-plugind-cli-key.yml',
         'verify_certificate': _CERT_FILE,
     },
     'plugind': {
