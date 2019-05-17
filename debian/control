@@ -12,8 +12,8 @@ Depends:
  ${python3:Depends},
  ${misc:Depends},
  python3-kombu,
+ wazo-auth-client-python3,
  wazo-plugind-client-python3,
- xivo-auth-client-python3,
  xivo-lib-python-python3
 Description: Wazo plugin command line interface
  Wazo is a system based on a powerful IPBX, to bring an easy to

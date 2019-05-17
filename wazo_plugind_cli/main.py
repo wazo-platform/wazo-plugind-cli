@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import sys
@@ -8,7 +8,7 @@ from xivo.cli import Interpreter, errorhandler
 from xivo.cli.command.unknown import RaisingUnknownCommand
 from xivo.token_renewer import TokenRenewer
 from wazo_plugind_client import Client as PlugindClient
-from xivo_auth_client import Client as AuthClient
+from wazo_auth_client import Client as AuthClient
 from .config import load_config
 from . import command
 
