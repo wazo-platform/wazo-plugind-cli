@@ -35,7 +35,9 @@ def main():
     interpreter.add_command('uninstall', command.UninstallCommand(plugind_client, config))
     interpreter.add_command('list', command.ListCommand(plugind_client))
 
-    token_renewer.subscribe_to_token_change(plugind_client.set_token)
+    token_renewer.subscribe_to_token_change(
+        lambda token: plugind_client.set_token(token['token'])
+    )
     command_name = config.get('command')
     with token_renewer:
         if command_name:
