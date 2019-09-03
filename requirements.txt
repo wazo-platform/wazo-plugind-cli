@@ -1,8 +1,8 @@
-https://github.com/wazo-pbx/wazo-auth-client/archive/master.zip
-https://github.com/wazo-pbx/xivo-lib-python/archive/master.zip
-https://github.com/wazo-pbx/xivo-lib-rest-client/archive/master.zip
-kombu==3.0.35
-pyyaml==3.12
+https://github.com/wazo-pbx/wazo-auth-client/archive/buster.zip
+https://github.com/wazo-pbx/xivo-lib-python/archive/buster.zip
+https://github.com/wazo-pbx/xivo-lib-rest-client/archive/buster.zip
+kombu==4.2.1
+pyyaml==3.13
 requests==2.21.0
-six==1.10.0
-stevedore==1.17.1
+six==1.12.0
+stevedore==1.29.0
