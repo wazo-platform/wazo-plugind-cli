@@ -1,4 +1,4 @@
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import queue
@@ -30,8 +30,8 @@ class _BaseAsyncCommand(_BasePlugindCommand):
                                        config['bus']['exchange_type'])
 
     def execute(self, *args):
-        async = args[-1]
-        if async:
+        async_ = args[-1]
+        if async_:
             self.execute_async(*args[:-1])
         else:
             self.execute_sync(*args[:-1])
