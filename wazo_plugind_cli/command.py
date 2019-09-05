@@ -78,8 +78,8 @@ class InstallCommand(_BaseAsyncCommand):
         try:
             method = command_args[0]
             plugin = command_args[1]
-            async = len(command_args) > 2 and command_args[2] == '--async'
-            return method, plugin, async
+            async_ = len(command_args) > 2 and command_args[2] == '--async'
+            return method, plugin, async_
         except Exception:
             raise UsageError()
 
@@ -96,8 +96,8 @@ class UninstallCommand(_BaseAsyncCommand):
     def prepare(self, command_args):
         try:
             namespace, name = command_args[0].split('/', 1)
-            async = len(command_args) > 1 and command_args[1] == '--async'
-            return namespace, name, async
+            async_ = len(command_args) > 1 and command_args[1] == '--async'
+            return namespace, name, async_
         except Exception:
             raise UsageError()
 
