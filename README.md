@@ -11,7 +11,7 @@ To install a plugin use the install command followed by the method and the URL
 Example:
 
 ```
-wazo-plugind-cli> install git https://github.com/wazo-pbx/wazo-admin-ui-conference.git
+wazo-plugind-cli> install git https://github.com/wazo-platform/wazo-admin-ui-conference.git
 extracting
 building
 packaging
@@ -25,7 +25,7 @@ wazo-plugind-cli>
 Example:
 
 ```
-wazo-plugind-cli> install git https://github.com/wazo-pbx/wazo-admin-ui-conference.git --async
+wazo-plugind-cli> install git https://github.com/wazo-platform/wazo-admin-ui-conference.git --async
 wazo-plugind-cli>
 ```
 
@@ -57,7 +57,7 @@ To execute a command without first entering the wazo-plugind cli use the -c argu
 Example:
 
 ```sh
-wazo-plugind-cli -c "install git https://github.com/wazo-pbx/wazo-admin-ui-user.git"
+wazo-plugind-cli -c "install git https://github.com/wazo-platform/wazo-admin-ui-user.git"
 ```
 
 ## Building a debian package
