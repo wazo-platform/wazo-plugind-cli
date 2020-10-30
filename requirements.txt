@@ -1,7 +1,7 @@
 https://github.com/wazo-platform/wazo-lib-rest-client/archive/master.zip
 https://github.com/wazo-platform/wazo-auth-client/archive/master.zip
 https://github.com/wazo-platform/xivo-lib-python/archive/master.zip
-kombu==4.2.1
+kombu==4.6.11
 pyyaml==3.13
 requests==2.21.0
 six==1.12.0
