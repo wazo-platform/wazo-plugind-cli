@@ -6,7 +6,6 @@ from .bus import ProgressConsumer
 
 
 class _BasePlugindCommand(BaseCommand):
-
     def __init__(self, client):
         super().__init__()
         self._client = client
@@ -41,8 +40,9 @@ class _BaseAsyncCommand(_BasePlugindCommand):
 
     def _wait_for_progress(self, consumer, command_uuid):
         for message in consumer:
-            if message['data']['uuid'] != command_uuid:
+            if not self._is_valid_message(message, command_uuid):
                 continue
+
             status = message['data']['status']
             done = status in self._end_status
             end = '\n' if done else '...\n'
@@ -50,6 +50,12 @@ class _BaseAsyncCommand(_BasePlugindCommand):
             print('{}'.format(status), end=end)
             if done:
                 return message['data']
+
+    def _is_valid_message(self, message, expected_uuid):
+        try:
+            return message['data']['uuid'] == expected_uuid
+        except KeyError:
+            return False
 
 
 class InstallCommand(_BaseAsyncCommand):
