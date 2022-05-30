@@ -1,16 +1,11 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-import queue
-import threading
-import kombu
 
 from xivo.cli import BaseCommand, UsageError
 from .bus import ProgressConsumer
 
 
 class _BasePlugindCommand(BaseCommand):
-
     def __init__(self, client):
         super().__init__()
         self._client = client
@@ -25,9 +20,7 @@ class _BaseAsyncCommand(_BasePlugindCommand):
 
     def __init__(self, plugind_client, config):
         super().__init__(plugind_client)
-        self.amqp_url = 'amqp://{username}:{password}@{host}:{port}//'.format(**config['bus'])
-        self.exchange = kombu.Exchange(config['bus']['exchange_name'],
-                                       config['bus']['exchange_type'])
+        self._config = config
 
     def execute(self, *args):
         async_ = args[-1]
@@ -37,35 +30,32 @@ class _BaseAsyncCommand(_BasePlugindCommand):
             self.execute_sync(*args[:-1])
 
     def execute_sync(self, *args):
-        msg_queue = queue.Queue()
-        status = None
-        last_status = None
-        with kombu.Connection(self.amqp_url) as conn:
-            consumer = ProgressConsumer(conn, self.routing_key, self.exchange, msg_queue)
-            thread = threading.Thread(target=consumer.run)
-            thread.start()
-            try:
-                result = self.execute_async(*args)
-                command_uuid = result['uuid']
-                last_status = self._wait_for_progress(msg_queue, command_uuid)
-            finally:
-                consumer.should_stop = True
-                thread.join()
-                if last_status and last_status['status'] == 'error':
-                    raise Exception(last_status)
+        with ProgressConsumer(self._config) as consumer:
+            result = self.execute_async(*args)
+            command_uuid = result['uuid']
+            last_status = self._wait_for_progress(consumer, command_uuid)
 
-    def _wait_for_progress(self, msg_queue, command_uuid):
-        while True:
-            msg = msg_queue.get()
-            if msg['data']['uuid'] != command_uuid:
+        if last_status and last_status['status'] == 'error':
+            raise Exception(last_status)
+
+    def _wait_for_progress(self, consumer, command_uuid):
+        for message in consumer:
+            if not self._is_valid_message(message, command_uuid):
                 continue
 
-            status = msg['data']['status']
+            status = message['data']['status']
             done = status in self._end_status
             end = '\n' if done else '...\n'
+
             print('{}'.format(status), end=end)
             if done:
-                return msg['data']
+                return message['data']
+
+    def _is_valid_message(self, message, expected_uuid):
+        try:
+            return message['data']['uuid'] == expected_uuid
+        except KeyError:
+            return False
 
 
 class InstallCommand(_BaseAsyncCommand):
@@ -114,4 +104,3 @@ class ListCommand(_BasePlugindCommand):
         print('* List of plugins installed *')
         for result in results['items']:
             print('- {namespace}/{name} ({version})'.format(**result))
-
