@@ -6,7 +6,7 @@ This is the command line interface for wazo-plugind.
 
 ### Installing a plugin
 
-To install a plugin use the install command followed by the method and the URL
+To install a plugin use the `install` command followed by the method and the URL
 
 Example:
 
@@ -31,7 +31,7 @@ wazo-plugind-cli>
 
 ### Deleting a plugin
 
-To remove a plugin, use the uninstall command
+To remove a plugin, use the `uninstall` command
 
 Example:
 
@@ -78,4 +78,4 @@ from the root of the project
 dpkg-buildpackage -us -uc
 ```
 
-If the build succeds, a .deb will be created in the parent directory.
+If the build succeeds, a .deb will be created in the parent directory.
