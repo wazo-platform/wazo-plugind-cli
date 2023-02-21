@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import sys
@@ -27,12 +27,16 @@ def main():
     token_renewer = TokenRenewer(_new_auth_client(config), expiration=600)
     plugind_client = PlugindClient(**config['plugind'])
 
-    interpreter = Interpreter(prompt='wazo-plugind-cli> ',
-                              history_file='~/.wazo_plugind_cli_history',
-                              error_handler=errorhandler.ReRaiseErrorHandler())
+    interpreter = Interpreter(
+        prompt='wazo-plugind-cli> ',
+        history_file='~/.wazo_plugind_cli_history',
+        error_handler=errorhandler.ReRaiseErrorHandler(),
+    )
     interpreter.set_unknown_command_class(RaisingUnknownCommand)
     interpreter.add_command('install', command.InstallCommand(plugind_client, config))
-    interpreter.add_command('uninstall', command.UninstallCommand(plugind_client, config))
+    interpreter.add_command(
+        'uninstall', command.UninstallCommand(plugind_client, config)
+    )
     interpreter.add_command('list', command.ListCommand(plugind_client))
 
     token_renewer.subscribe_to_token_change(plugind_client.set_token)

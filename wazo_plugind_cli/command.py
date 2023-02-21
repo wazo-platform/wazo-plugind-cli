@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.cli import BaseCommand, UsageError
@@ -15,7 +15,6 @@ class _BasePlugindCommand(BaseCommand):
 
 
 class _BaseAsyncCommand(_BasePlugindCommand):
-
     _end_status = ['completed', 'error']
 
     def __init__(self, plugind_client, config):
@@ -59,7 +58,6 @@ class _BaseAsyncCommand(_BasePlugindCommand):
 
 
 class InstallCommand(_BaseAsyncCommand):
-
     help = 'Install a plugin'
     usage = '<method> <plugin> [--async]'
     routing_key = 'plugin.install.*.*'
@@ -78,7 +76,6 @@ class InstallCommand(_BaseAsyncCommand):
 
 
 class UninstallCommand(_BaseAsyncCommand):
-
     help = 'Uninstall a plugin'
     usage = '<namespace>/<name> [--async]'
     routing_key = 'plugin.uninstall.*.*'
@@ -96,7 +93,6 @@ class UninstallCommand(_BaseAsyncCommand):
 
 
 class ListCommand(_BasePlugindCommand):
-
     help = 'List plugins'
 
     def execute(self):

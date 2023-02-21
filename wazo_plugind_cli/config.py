@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -38,10 +38,7 @@ def load_config(argv):
 
 def _parse_cli_args(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c',
-                        '--command',
-                        action='store',
-                        help='Command to run.')
+    parser.add_argument('-c', '--command', action='store', help='Command to run.')
     parsed_args = parser.parse_args(argv)
     result = {}
     if parsed_args.command:
@@ -52,5 +49,9 @@ def _parse_cli_args(argv):
 
 def _load_key_file(config):
     key_file = parse_config_file(config['auth']['key_file'])
-    return {'auth': {'service_id': key_file['service_id'],
-                     'service_key': key_file['service_key']}}
+    return {
+        'auth': {
+            'service_id': key_file['service_id'],
+            'service_key': key_file['service_key'],
+        }
+    }
