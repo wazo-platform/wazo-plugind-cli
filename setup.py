@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from setuptools import setup
@@ -15,6 +15,6 @@ setup(
     url='http://wazo.community',
     packages=find_packages(),
     entry_points={
-        'console_scripts': ['{}=wazo_plugind_cli.main:main'.format(NAME)],
+        'console_scripts': [f'{NAME}=wazo_plugind_cli.main:main'],
     },
 )
