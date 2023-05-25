@@ -46,7 +46,7 @@ class _BaseAsyncCommand(_BasePlugindCommand):
             done = status in self._end_status
             end = '\n' if done else '...\n'
 
-            print('{}'.format(status), end=end)
+            print(f'{status}', end=end)
             if done:
                 return message['data']
 
