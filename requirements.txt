@@ -3,5 +3,5 @@ https://github.com/wazo-platform/wazo-auth-client/archive/master.zip
 https://github.com/wazo-platform/xivo-lib-python/archive/master.zip
 kombu==5.0.2
 pyyaml==5.3.1
-requests==2.25.1
+requests==2.31.0
 stevedore==3.2.2
