@@ -25,7 +25,7 @@ wazo-plugind-cli>
 Example:
 
 ```
-wazo-plugind-cli> install git https://github.com/wazo-platform/wazo-admin-ui-conference.git --async
+wazo-plugind-cli> install git https://github.com/wazo-platform/wazo-admin-ui-conference.git --ref main --async
 wazo-plugind-cli>
 ```
 
