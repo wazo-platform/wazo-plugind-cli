@@ -59,20 +59,24 @@ class _BaseAsyncCommand(_BasePlugindCommand):
 
 class InstallCommand(_BaseAsyncCommand):
     help = 'Install a plugin'
-    usage = '<method> <plugin> [--async]'
+    usage = '<method> <plugin> [--ref reference] [--async]'
     routing_key = 'plugin.install.*.*'
 
     def prepare(self, command_args):
+        options = {}
         try:
             method = command_args[0]
             plugin = command_args[1]
-            async_ = len(command_args) > 2 and command_args[2] == '--async'
-            return method, plugin, async_
+            optional_args = command_args[2:]
+            async_ = '--async' in optional_args
+            if method == 'git' and '--ref' in optional_args:
+                options['ref'] = optional_args[optional_args.index('--ref') + 1]
+            return method, plugin, options, async_
         except Exception:
             raise UsageError()
 
-    def execute_async(self, method, plugin):
-        return self._client.plugins.install(plugin, method)
+    def execute_async(self, method, plugin, options):
+        return self._client.plugins.install(plugin, method, options)
 
 
 class UninstallCommand(_BaseAsyncCommand):
