@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
+
 from xivo.chain_map import ChainMap
 from xivo.config_helper import parse_config_file
 

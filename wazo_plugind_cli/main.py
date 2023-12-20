@@ -4,13 +4,14 @@
 
 import sys
 
+from wazo_auth_client import Client as AuthClient
+from wazo_plugind_client import Client as PlugindClient
 from xivo.cli import Interpreter, errorhandler
 from xivo.cli.command.unknown import RaisingUnknownCommand
 from xivo.token_renewer import TokenRenewer
-from wazo_plugind_client import Client as PlugindClient
-from wazo_auth_client import Client as AuthClient
-from .config import load_config
+
 from . import command
+from .config import load_config
 
 
 def _new_auth_client(config):
