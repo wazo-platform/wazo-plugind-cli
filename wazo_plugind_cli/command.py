@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.cli import BaseCommand, UsageError
+
 from .bus import ProgressConsumer
 
 
