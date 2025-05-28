@@ -1,4 +1,4 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.cli import BaseCommand, UsageError
@@ -70,8 +70,13 @@ class InstallCommand(_BaseAsyncCommand):
             plugin = command_args[1]
             optional_args = command_args[2:]
             async_ = '--async' in optional_args
-            if method == 'git' and '--ref' in optional_args:
-                options['ref'] = optional_args[optional_args.index('--ref') + 1]
+            if method == 'git':
+                if '--ref' in optional_args:
+                    value_index = optional_args.index('--ref') + 1
+                    options['ref'] = optional_args[value_index]
+                if '--subdirectory' in optional_args:
+                    value_index = optional_args.index('--subdirectory') + 1
+                    options['subdirectory'] = optional_args[value_index]
             return method, plugin, options, async_
         except Exception:
             raise UsageError()
