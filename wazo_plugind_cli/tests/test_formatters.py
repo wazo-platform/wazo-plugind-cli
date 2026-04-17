@@ -7,13 +7,13 @@ from wazo_plugind_cli.formatters import LegacyPluginListFormatter
 
 
 class TestLegacyPluginListFormatter:
-    def test_empty_list(self):
+    def test_empty_list(self) -> None:
         stdout = io.StringIO()
         formatter = LegacyPluginListFormatter()
         formatter.emit_list(('namespace', 'name', 'version'), [], stdout, None)
         assert stdout.getvalue() == '* List of plugins installed *\n'
 
-    def test_renders_rows(self):
+    def test_renders_rows(self) -> None:
         stdout = io.StringIO()
         formatter = LegacyPluginListFormatter()
         formatter.emit_list(

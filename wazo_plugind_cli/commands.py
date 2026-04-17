@@ -1,6 +1,12 @@
 # Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
+
+import argparse
+from collections.abc import Callable, Iterator
+from typing import Any
+
 from cliff.command import Command
 from cliff.lister import Lister
 
@@ -9,14 +15,14 @@ from .bus import ProgressConsumer
 _END_STATUSES = ('completed', 'error')
 
 
-def _is_valid_message(message, expected_uuid):
+def _is_valid_message(message: dict, expected_uuid: str) -> bool:
     try:
         return message['data']['uuid'] == expected_uuid
     except KeyError:
         return False
 
 
-def _wait_for_progress(consumer, command_uuid):
+def _wait_for_progress(consumer: Iterator[dict], command_uuid: str) -> dict | None:
     for message in consumer:
         if not _is_valid_message(message, command_uuid):
             continue
@@ -31,7 +37,7 @@ def _wait_for_progress(consumer, command_uuid):
     return None
 
 
-def _run_async(plugind_call, config, async_):
+def _run_async(plugind_call: Callable[[], dict], config: dict, async_: bool) -> None:
     result = plugind_call()
     if async_:
         return
@@ -46,7 +52,7 @@ def _run_async(plugind_call, config, async_):
 class InstallCommand(Command):
     """Install a plugin"""
 
-    def get_parser(self, *args, **kwargs):
+    def get_parser(self, *args: Any, **kwargs: Any) -> argparse.ArgumentParser:
         parser = super().get_parser(*args, **kwargs)
         parser.add_argument('method', help='Installation method (e.g. git)')
         parser.add_argument('plugin', help='Plugin identifier (e.g. git URL)')
@@ -60,8 +66,8 @@ class InstallCommand(Command):
         )
         return parser
 
-    def take_action(self, parsed_args):
-        options = {}
+    def take_action(self, parsed_args: argparse.Namespace) -> None:
+        options: dict[str, str] = {}
         if parsed_args.method == 'git':
             if parsed_args.ref:
                 options['ref'] = parsed_args.ref
@@ -80,7 +86,7 @@ class InstallCommand(Command):
 class UninstallCommand(Command):
     """Uninstall a plugin"""
 
-    def get_parser(self, *args, **kwargs):
+    def get_parser(self, *args: Any, **kwargs: Any) -> argparse.ArgumentParser:
         parser = super().get_parser(*args, **kwargs)
         parser.add_argument('plugin', help='Plugin in the form <namespace>/<name>')
         parser.add_argument(
@@ -91,7 +97,7 @@ class UninstallCommand(Command):
         )
         return parser
 
-    def take_action(self, parsed_args):
+    def take_action(self, parsed_args: argparse.Namespace) -> None:
         try:
             namespace, name = parsed_args.plugin.split('/', 1)
         except ValueError:
@@ -110,10 +116,12 @@ class ListCommand(Lister):
     COLUMNS = ('namespace', 'name', 'version')
 
     @property
-    def formatter_default(self):
+    def formatter_default(self) -> str:
         return 'legacy'
 
-    def take_action(self, parsed_args):
+    def take_action(
+        self, parsed_args: argparse.Namespace
+    ) -> tuple[tuple[str, ...], list[tuple[str, str, str]]]:
         results = self.app.client.plugins.list()
         rows = [
             (item['namespace'], item['name'], item['version'])

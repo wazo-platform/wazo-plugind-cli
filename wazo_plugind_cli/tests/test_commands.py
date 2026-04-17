@@ -14,23 +14,23 @@ from wazo_plugind_cli.commands import (
 
 
 class TestIsValidMessage:
-    def test_matching_uuid(self):
+    def test_matching_uuid(self) -> None:
         message = {'data': {'uuid': 'abc'}}
         assert _is_valid_message(message, 'abc') is True
 
-    def test_mismatched_uuid(self):
+    def test_mismatched_uuid(self) -> None:
         message = {'data': {'uuid': 'abc'}}
         assert _is_valid_message(message, 'xyz') is False
 
-    def test_missing_data(self):
+    def test_missing_data(self) -> None:
         assert _is_valid_message({}, 'abc') is False
 
-    def test_missing_uuid(self):
+    def test_missing_uuid(self) -> None:
         assert _is_valid_message({'data': {}}, 'abc') is False
 
 
 class TestWaitForProgress:
-    def test_filters_by_uuid_and_stops_on_completed(self):
+    def test_filters_by_uuid_and_stops_on_completed(self) -> None:
         consumer = iter(
             [
                 {'data': {'uuid': 'other', 'status': 'building'}},
@@ -41,7 +41,7 @@ class TestWaitForProgress:
         result = _wait_for_progress(consumer, 'abc')
         assert result == {'uuid': 'abc', 'status': 'completed'}
 
-    def test_stops_on_error(self):
+    def test_stops_on_error(self) -> None:
         consumer = iter(
             [
                 {'data': {'uuid': 'abc', 'status': 'error'}},
@@ -52,12 +52,12 @@ class TestWaitForProgress:
 
 
 class TestInstallCommand:
-    def _make_app(self):
+    def _make_app(self) -> Mock:
         app = Mock()
         app._config = {'bus': {}}
         return app
 
-    def test_async_does_not_stream(self):
+    def test_async_does_not_stream(self) -> None:
         app = self._make_app()
         app.client.plugins.install.return_value = {'uuid': 'abc'}
         cmd = InstallCommand(app, None)
@@ -73,7 +73,7 @@ class TestInstallCommand:
             'https://example.org/repo.git', 'git', {}
         )
 
-    def test_git_with_ref_and_subdirectory(self):
+    def test_git_with_ref_and_subdirectory(self) -> None:
         app = self._make_app()
         app.client.plugins.install.return_value = {'uuid': 'abc'}
         cmd = InstallCommand(app, None)
@@ -91,7 +91,7 @@ class TestInstallCommand:
             {'ref': 'main', 'subdirectory': 'subdir'},
         )
 
-    def test_non_git_ignores_ref(self):
+    def test_non_git_ignores_ref(self) -> None:
         app = self._make_app()
         app.client.plugins.install.return_value = {'uuid': 'abc'}
         cmd = InstallCommand(app, None)
@@ -108,7 +108,7 @@ class TestInstallCommand:
         )
 
     @patch('wazo_plugind_cli.commands.ProgressConsumer')
-    def test_sync_streams_progress(self, mock_consumer_cls):
+    def test_sync_streams_progress(self, mock_consumer_cls: Mock) -> None:
         app = self._make_app()
         app.client.plugins.install.return_value = {'uuid': 'abc'}
 
@@ -131,12 +131,12 @@ class TestInstallCommand:
 
 
 class TestUninstallCommand:
-    def _make_app(self):
+    def _make_app(self) -> Mock:
         app = Mock()
         app._config = {'bus': {}}
         return app
 
-    def test_async(self):
+    def test_async(self) -> None:
         app = self._make_app()
         app.client.plugins.uninstall.return_value = {'uuid': 'abc'}
         cmd = UninstallCommand(app, None)
@@ -146,7 +146,7 @@ class TestUninstallCommand:
             'official', 'admin-ui-conference'
         )
 
-    def test_invalid_plugin_raises(self):
+    def test_invalid_plugin_raises(self) -> None:
         app = self._make_app()
         cmd = UninstallCommand(app, None)
         parsed_args = Namespace(plugin='no-slash', async_=True)
@@ -158,7 +158,7 @@ class TestUninstallCommand:
 
 
 class TestListCommand:
-    def test_take_action_returns_columns_and_rows(self):
+    def test_take_action_returns_columns_and_rows(self) -> None:
         app = Mock()
         app.client.plugins.list.return_value = {
             'items': [
