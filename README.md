@@ -1,62 +1,63 @@
 # wazo-plugind-cli
 
-This is the command line interface for wazo-plugind.
+A CLI program to interact with wazo-plugind.
 
 ## Usage
 
 ### Installing a plugin
 
-To install a plugin use the `install` command followed by the method and the URL
-
-Example:
-
-```
-wazo-plugind-cli> install git https://github.com/wazo-platform/wazo-admin-ui-conference.git
-extracting
-building
-packaging
-installing
+```shell
+$ wazo-plugind-cli install git https://github.com/wazo-platform/wazo-admin-ui-conference.git
+extracting...
+building...
+packaging...
+installing...
 completed
-wazo-plugind-cli>
 ```
 
-"--async" can be used to avoid waiting until the end of the plugin installation.
+Use `--async` to return immediately without waiting for completion:
 
-Example:
-
-```
-wazo-plugind-cli> install git https://github.com/wazo-platform/wazo-admin-ui-conference.git --ref main --async
-wazo-plugind-cli>
+```shell
+wazo-plugind-cli install git https://github.com/wazo-platform/wazo-admin-ui-conference.git --ref main --async
 ```
 
-### Deleting a plugin
+Supported options on `git` installs: `--ref <ref>`, `--subdirectory <path>`.
 
-To remove a plugin, use the `uninstall` command
+### Uninstalling a plugin
 
-Example:
-
-```
-wazo-plugind-cli> uninstall official/admin-ui-conference
+```shell
+$ wazo-plugind-cli uninstall official/admin-ui-conference
 completed
-wazo-plugind-cli>
 ```
 
-This command can also be executed asynchronously using the --async command flag
+`--async` is also supported.
 
-Example:
+### Listing installed plugins
 
+```shell
+$ wazo-plugind-cli list
+* List of plugins installed *
+- official/admin-ui-conference (1.0.0)
 ```
-wazo-plugind-cli> uninstall official/admin-ui-conference --async
-wazo-plugind-cli>
+
+`list` supports cliff's `-f` flag for alternative output formats:
+
+```shell
+wazo-plugind-cli list -f table
+wazo-plugind-cli list -f json
+wazo-plugind-cli list -f csv
+wazo-plugind-cli list -f yaml
 ```
 
-### Executing commands without entering the CLI
+The default format is the legacy text format.
 
-To execute a command without first entering the wazo-plugind cli use the -c argument.
+### Legacy `-c` flag
 
-Example:
+The `-c "<command>"` invocation is still accepted for backward
+compatibility but is deprecated; prefer passing the command as direct
+arguments.
 
-```sh
+```shell
 wazo-plugind-cli -c "install git https://github.com/wazo-platform/wazo-admin-ui-user.git"
 ```
 
@@ -64,7 +65,7 @@ wazo-plugind-cli -c "install git https://github.com/wazo-platform/wazo-admin-ui-
 
 ### Increment the package version in the changelog
 
-from the root of the project
+From the root of the project:
 
 ```sh
 dch -i
@@ -72,10 +73,10 @@ dch -i
 
 ### Build the package
 
-from the root of the project
+From the root of the project:
 
 ```sh
 dpkg-buildpackage -us -uc
 ```
 
-If the build succeeds, a .deb will be created in the parent directory.
+If the build succeeds, a `.deb` will be created in the parent directory.
