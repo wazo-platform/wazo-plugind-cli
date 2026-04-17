@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from cliff.command import Command
+from cliff.lister import Lister
 
 from .bus import ProgressConsumer
 
@@ -103,11 +104,19 @@ class UninstallCommand(Command):
         )
 
 
-class ListCommand(Command):
+class ListCommand(Lister):
     """List installed plugins"""
+
+    COLUMNS = ('namespace', 'name', 'version')
+
+    @property
+    def formatter_default(self):
+        return 'legacy'
 
     def take_action(self, parsed_args):
         results = self.app.client.plugins.list()
-        print('* List of plugins installed *')
-        for result in results['items']:
-            print('- {namespace}/{name} ({version})'.format(**result))
+        rows = [
+            (item['namespace'], item['name'], item['version'])
+            for item in results['items']
+        ]
+        return self.COLUMNS, rows

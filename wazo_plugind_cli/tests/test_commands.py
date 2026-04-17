@@ -158,7 +158,7 @@ class TestUninstallCommand:
 
 
 class TestListCommand:
-    def test_take_action_prints_plugins(self, capsys):
+    def test_take_action_returns_columns_and_rows(self):
         app = Mock()
         app.client.plugins.list.return_value = {
             'items': [
@@ -167,8 +167,9 @@ class TestListCommand:
             ]
         }
         cmd = ListCommand(app, None)
-        cmd.take_action(Namespace())
-        output = capsys.readouterr().out
-        assert '* List of plugins installed *' in output
-        assert '- official/foo (1.0)' in output
-        assert '- official/bar (2.1)' in output
+        columns, rows = cmd.take_action(Namespace())
+        assert columns == ('namespace', 'name', 'version')
+        assert rows == [
+            ('official', 'foo', '1.0'),
+            ('official', 'bar', '2.1'),
+        ]

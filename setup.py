@@ -15,6 +15,9 @@ setup(
         'console_scripts': [
             'wazo-plugind-cli = wazo_plugind_cli.main:main',
         ],
+        'cliff.formatter.list': [
+            'legacy = wazo_plugind_cli.formatters:LegacyPluginListFormatter',
+        ],
         'wazo_plugind_cli.commands': [
             'install = wazo_plugind_cli.commands:InstallCommand',
             'uninstall = wazo_plugind_cli.commands:UninstallCommand',
