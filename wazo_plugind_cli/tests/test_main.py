@@ -3,7 +3,7 @@
 
 from unittest.mock import Mock, patch
 
-from wazo_plugind_cli.main import WazoPlugindCLI
+from wazo_plugind_cli.main import WazoPlugindCLI, _expand_deprecated_command_flag
 
 
 class TestClientProperty:
@@ -79,3 +79,35 @@ class TestCleanUp:
         WazoPlugindCLI.clean_up(app, cmd=None, result=None, err=None)
 
         app._auth_client.token.revoke.assert_not_called()
+
+
+class TestExpandDeprecatedCommandFlag:
+    def test_short_flag(self):
+        result = _expand_deprecated_command_flag(['-c', 'install git URL'])
+        assert result == ['install', 'git', 'URL']
+
+    def test_long_flag(self):
+        result = _expand_deprecated_command_flag(['--command', 'list'])
+        assert result == ['list']
+
+    def test_short_flag_equals_form(self):
+        result = _expand_deprecated_command_flag(['-c=list'])
+        assert result == ['list']
+
+    def test_long_flag_equals_form(self):
+        result = _expand_deprecated_command_flag(['--command=install git URL'])
+        assert result == ['install', 'git', 'URL']
+
+    def test_flag_mixed_with_other_args(self):
+        result = _expand_deprecated_command_flag(['--host', 'myhost', '-c', 'list'])
+        assert result == ['--host', 'myhost', 'list']
+
+    def test_flag_without_value(self):
+        assert _expand_deprecated_command_flag(['-c']) == ['-c']
+
+    def test_no_flag(self):
+        assert _expand_deprecated_command_flag(['install', 'git', 'URL']) == [
+            'install',
+            'git',
+            'URL',
+        ]

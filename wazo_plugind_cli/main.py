@@ -74,9 +74,33 @@ class WazoPlugindCLI(App):
             self._remove_token = False
 
 
+def _expand_deprecated_command_flag(argv):
+    """Support legacy -c/--command flag by expanding its value into argv.
+
+    e.g. ['-c', 'install git URL'] -> ['install', 'git', 'URL']
+    """
+    argv = list(argv)
+    for i, arg in enumerate(argv):
+        for flag in ('-c', '--command'):
+            if arg == flag and i + 1 < len(argv):
+                command_str = argv[i + 1]
+                argv[i : i + 2] = command_str.split()
+            elif arg.startswith(f'{flag}='):
+                command_str = arg[len(flag) + 1 :]
+                argv[i : i + 1] = command_str.split()
+            else:
+                continue
+            print(
+                f'Warning: {flag} is deprecated, use: wazo-plugind-cli {command_str}',
+                file=sys.stderr,
+            )
+            return argv
+    return argv
+
+
 def main(argv=sys.argv[1:]):
     app = WazoPlugindCLI()
-    return app.run(argv)
+    return app.run(_expand_deprecated_command_flag(argv))
 
 
 if __name__ == '__main__':
