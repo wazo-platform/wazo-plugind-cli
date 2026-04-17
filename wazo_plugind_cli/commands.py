@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import argparse
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Mapping
 from typing import Any
 
 from cliff.command import Command
@@ -37,7 +37,12 @@ def _wait_for_progress(consumer: Iterator[dict], command_uuid: str) -> dict | No
     return None
 
 
-def _run_async(plugind_call: Callable[[], dict], config: dict, async_: bool) -> None:
+def _dispatch_plugind_call(
+    plugind_call: Callable[[], dict],
+    config: Mapping[str, Any],
+    async_: bool,
+) -> None:
+    """Invoke a plugind call; if async_ is False, stream progress until done."""
     result = plugind_call()
     if async_:
         return
@@ -74,7 +79,7 @@ class InstallCommand(Command):
             if parsed_args.subdirectory:
                 options['subdirectory'] = parsed_args.subdirectory
 
-        _run_async(
+        _dispatch_plugind_call(
             lambda: self.app.client.plugins.install(
                 parsed_args.plugin, parsed_args.method, options
             ),
@@ -98,12 +103,11 @@ class UninstallCommand(Command):
         return parser
 
     def take_action(self, parsed_args: argparse.Namespace) -> None:
-        try:
-            namespace, name = parsed_args.plugin.split('/', 1)
-        except ValueError:
+        if '/' not in parsed_args.plugin:
             raise ValueError('plugin must be in the form <namespace>/<name>')
+        namespace, name = parsed_args.plugin.split('/', 1)
 
-        _run_async(
+        _dispatch_plugind_call(
             lambda: self.app.client.plugins.uninstall(namespace, name),
             self.app._config,
             parsed_args.async_,

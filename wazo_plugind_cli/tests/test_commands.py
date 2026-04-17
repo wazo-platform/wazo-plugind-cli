@@ -4,6 +4,8 @@
 from argparse import Namespace
 from unittest.mock import MagicMock, Mock, patch
 
+import pytest
+
 from wazo_plugind_cli.commands import (
     InstallCommand,
     ListCommand,
@@ -150,11 +152,8 @@ class TestUninstallCommand:
         app = self._make_app()
         cmd = UninstallCommand(app, None)
         parsed_args = Namespace(plugin='no-slash', async_=True)
-        try:
+        with pytest.raises(ValueError):
             cmd.take_action(parsed_args)
-        except ValueError:
-            return
-        raise AssertionError('expected ValueError')
 
 
 class TestListCommand:

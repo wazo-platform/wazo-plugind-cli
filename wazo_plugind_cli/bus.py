@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from queue import Queue
 from threading import Thread
 from typing import Any
@@ -13,7 +14,7 @@ from kombu.mixins import ConsumerMixin
 
 
 class ProgressConsumer(ConsumerMixin):
-    def __init__(self, config: dict) -> None:
+    def __init__(self, config: Mapping[str, Any]) -> None:
         if 'bus' in config:
             config = config['bus']
 
