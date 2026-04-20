@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import argparse
-from collections.abc import Callable, Iterator, Mapping
+from collections.abc import Iterator, Mapping
 from typing import Any
 
 from cliff.command import Command
@@ -37,18 +37,9 @@ def _wait_for_progress(consumer: Iterator[dict], command_uuid: str) -> dict | No
     return None
 
 
-def _dispatch_plugind_call(
-    plugind_call: Callable[[], dict],
-    config: Mapping[str, Any],
-    async_: bool,
-) -> None:
-    """Invoke a plugind call; if async_ is False, stream progress until done."""
-    result = plugind_call()
-    if async_:
-        return
-
+def _wait_for_completion(command_uuid: str, config: Mapping[str, Any]) -> None:
     with ProgressConsumer(config) as consumer:
-        last_status = _wait_for_progress(consumer, result['uuid'])
+        last_status = _wait_for_progress(consumer, command_uuid)
 
     if last_status and last_status['status'] == 'error':
         raise Exception(last_status)
@@ -79,13 +70,11 @@ class InstallCommand(Command):
             if parsed_args.subdirectory:
                 options['subdirectory'] = parsed_args.subdirectory
 
-        _dispatch_plugind_call(
-            lambda: self.app.client.plugins.install(
-                parsed_args.plugin, parsed_args.method, options
-            ),
-            self.app._config,
-            parsed_args.async_,
+        result = self.app.client.plugins.install(
+            parsed_args.plugin, parsed_args.method, options
         )
+        if not parsed_args.async_:
+            _wait_for_completion(result['uuid'], self.app._config)
 
 
 class UninstallCommand(Command):
@@ -107,11 +96,9 @@ class UninstallCommand(Command):
             raise ValueError('plugin must be in the form <namespace>/<name>')
         namespace, name = parsed_args.plugin.split('/', 1)
 
-        _dispatch_plugind_call(
-            lambda: self.app.client.plugins.uninstall(namespace, name),
-            self.app._config,
-            parsed_args.async_,
-        )
+        result = self.app.client.plugins.uninstall(namespace, name)
+        if not parsed_args.async_:
+            _wait_for_completion(result['uuid'], self.app._config)
 
 
 class ListCommand(Lister):
