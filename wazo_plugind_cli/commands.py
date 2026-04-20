@@ -22,7 +22,9 @@ def _is_valid_message(message: dict, expected_uuid: str) -> bool:
         return False
 
 
-def _wait_for_progress(consumer: Iterator[dict], command_uuid: str) -> dict | None:
+def _stream_progress_until_done(
+    consumer: Iterator[dict], command_uuid: str
+) -> dict | None:
     for message in consumer:
         if not _is_valid_message(message, command_uuid):
             continue
@@ -39,7 +41,7 @@ def _wait_for_progress(consumer: Iterator[dict], command_uuid: str) -> dict | No
 
 def _wait_for_completion(command_uuid: str, config: Mapping[str, Any]) -> None:
     with ProgressConsumer(config) as consumer:
-        last_status = _wait_for_progress(consumer, command_uuid)
+        last_status = _stream_progress_until_done(consumer, command_uuid)
 
     if last_status and last_status['status'] == 'error':
         raise Exception(last_status)

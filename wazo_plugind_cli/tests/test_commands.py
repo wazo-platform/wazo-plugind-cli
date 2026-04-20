@@ -11,7 +11,7 @@ from wazo_plugind_cli.commands import (
     ListCommand,
     UninstallCommand,
     _is_valid_message,
-    _wait_for_progress,
+    _stream_progress_until_done,
 )
 
 
@@ -31,7 +31,7 @@ class TestIsValidMessage:
         assert _is_valid_message({'data': {}}, 'abc') is False
 
 
-class TestWaitForProgress:
+class TestStreamProgressUntilDone:
     def test_filters_by_uuid_and_stops_on_completed(self) -> None:
         consumer = iter(
             [
@@ -40,7 +40,7 @@ class TestWaitForProgress:
                 {'data': {'uuid': 'abc', 'status': 'completed'}},
             ]
         )
-        result = _wait_for_progress(consumer, 'abc')
+        result = _stream_progress_until_done(consumer, 'abc')
         assert result == {'uuid': 'abc', 'status': 'completed'}
 
     def test_stops_on_error(self) -> None:
@@ -49,7 +49,7 @@ class TestWaitForProgress:
                 {'data': {'uuid': 'abc', 'status': 'error'}},
             ]
         )
-        result = _wait_for_progress(consumer, 'abc')
+        result = _stream_progress_until_done(consumer, 'abc')
         assert result == {'uuid': 'abc', 'status': 'error'}
 
 
