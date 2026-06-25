@@ -16,7 +16,7 @@ setup(
             'wazo-plugind-cli = wazo_plugind_cli.main:main',
         ],
         'cliff.formatter.list': [
-            'legacy = wazo_plugind_cli.formatters:LegacyPluginListFormatter',
+            'plugind_legacy = wazo_plugind_cli.formatters:LegacyPluginListFormatter',
         ],
         'wazo_plugind_cli.commands': [
             'install = wazo_plugind_cli.commands:InstallCommand',

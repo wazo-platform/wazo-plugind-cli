@@ -110,7 +110,7 @@ class ListCommand(Lister):
 
     @property
     def formatter_default(self) -> str:
-        return 'legacy'
+        return 'plugind_legacy'
 
     def take_action(
         self, parsed_args: argparse.Namespace
