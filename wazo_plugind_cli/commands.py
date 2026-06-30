@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import argparse
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator
 from typing import Any
 
 from cliff.command import Command
@@ -39,10 +39,8 @@ def _stream_progress_until_done(
     return None
 
 
-def _wait_for_completion(command_uuid: str, config: Mapping[str, Any]) -> None:
-    with ProgressConsumer(config) as consumer:
-        last_status = _stream_progress_until_done(consumer, command_uuid)
-
+def _wait_for_completion(consumer: Iterator[dict], command_uuid: str) -> None:
+    last_status = _stream_progress_until_done(consumer, command_uuid)
     if last_status and last_status['status'] == 'error':
         raise Exception(last_status)
 
@@ -72,11 +70,17 @@ class InstallCommand(Command):
             if parsed_args.subdirectory:
                 options['subdirectory'] = parsed_args.subdirectory
 
-        result = self.app.client.plugins.install(
-            parsed_args.plugin, parsed_args.method, options
-        )
-        if not parsed_args.async_:
-            _wait_for_completion(result['uuid'], self.app._config)
+        if parsed_args.async_:
+            self.app.client.plugins.install(
+                parsed_args.plugin, parsed_args.method, options
+            )
+            return
+
+        with ProgressConsumer(self.app._config) as consumer:
+            result = self.app.client.plugins.install(
+                parsed_args.plugin, parsed_args.method, options
+            )
+            _wait_for_completion(consumer, result['uuid'])
 
 
 class UninstallCommand(Command):
@@ -98,9 +102,13 @@ class UninstallCommand(Command):
             raise ValueError('plugin must be in the form <namespace>/<name>')
         namespace, name = parsed_args.plugin.split('/', 1)
 
-        result = self.app.client.plugins.uninstall(namespace, name)
-        if not parsed_args.async_:
-            _wait_for_completion(result['uuid'], self.app._config)
+        if parsed_args.async_:
+            self.app.client.plugins.uninstall(namespace, name)
+            return
+
+        with ProgressConsumer(self.app._config) as consumer:
+            result = self.app.client.plugins.uninstall(namespace, name)
+            _wait_for_completion(consumer, result['uuid'])
 
 
 class ListCommand(Lister):
