@@ -1,7 +1,10 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import argparse
+from __future__ import annotations
+
+from argparse import Namespace
+from typing import Any
 
 from xivo.chain_map import ChainMap
 from xivo.config_helper import parse_config_file
@@ -31,24 +34,23 @@ _DEFAULT_CONFIG = {
 }
 
 
-def load_config(argv):
-    cli_config = _parse_cli_args(argv)
-    key_config = _load_key_file(ChainMap(cli_config, _DEFAULT_CONFIG))
-    return ChainMap(cli_config, key_config, _DEFAULT_CONFIG)
+def _args_to_dict(parsed_args: Namespace) -> dict[str, Any]:
+    plugind_config: dict[str, Any] = {}
+    host = getattr(parsed_args, 'host', None)
+    if host:
+        plugind_config['host'] = host
+    port = getattr(parsed_args, 'port', None)
+    if port:
+        plugind_config['port'] = port
+
+    config: dict[str, Any] = {}
+    if plugind_config:
+        config['plugind'] = plugind_config
+
+    return config
 
 
-def _parse_cli_args(argv):
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--command', action='store', help='Command to run.')
-    parsed_args = parser.parse_args(argv)
-    result = {}
-    if parsed_args.command:
-        result['command'] = parsed_args.command
-
-    return result
-
-
-def _load_key_file(config):
+def _load_key_file(config: ChainMap) -> dict[str, dict[str, str]]:
     key_file = parse_config_file(config['auth']['key_file'])
     return {
         'auth': {
@@ -56,3 +58,9 @@ def _load_key_file(config):
             'service_key': key_file['service_key'],
         }
     }
+
+
+def build(parsed_args: Namespace) -> ChainMap:
+    cli_config = _args_to_dict(parsed_args)
+    key_config = _load_key_file(ChainMap(cli_config, _DEFAULT_CONFIG))
+    return ChainMap(cli_config, key_config, _DEFAULT_CONFIG)

@@ -1,18 +1,27 @@
 #!/usr/bin/env python3
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from setuptools import find_packages, setup
 
-NAME = 'wazo-plugind-cli'
 setup(
-    name=NAME,
+    name='wazo-plugind-cli',
     version='0.1',
     author='Wazo Authors',
     author_email='dev@wazo.community',
     url='http://wazo.community',
     packages=find_packages(),
     entry_points={
-        'console_scripts': [f'{NAME}=wazo_plugind_cli.main:main'],
+        'console_scripts': [
+            'wazo-plugind-cli = wazo_plugind_cli.main:main',
+        ],
+        'cliff.formatter.list': [
+            'plugind_legacy = wazo_plugind_cli.formatters:LegacyPluginListFormatter',
+        ],
+        'wazo_plugind_cli.commands': [
+            'install = wazo_plugind_cli.commands:InstallCommand',
+            'uninstall = wazo_plugind_cli.commands:UninstallCommand',
+            'list = wazo_plugind_cli.commands:ListCommand',
+        ],
     },
 )
