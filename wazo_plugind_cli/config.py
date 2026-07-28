@@ -12,8 +12,7 @@ from xivo.config_helper import parse_config_file
 _DEFAULT_CONFIG = {
     'auth': {
         'host': 'localhost',
-        'port': 9497,
-        'prefix': None,
+        'port': 80,
         'https': False,
         'key_file': '/var/lib/wazo-auth-keys/wazo-plugind-cli-key.yml',
     },
